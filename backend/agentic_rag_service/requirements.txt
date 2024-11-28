@@ -1,0 +1,13 @@
+nameko==2.14.1
+amqp==5.2.0
+nameko-redis==1.0.0
+azure-search-documents
+azure-core
+openai
+python-dotenv
+gunicorn==20.1.0
+elasticsearch==8.10.0
+langchain
+langchain_community
+faiss-cpu
+

@@ -1,0 +1,65 @@
+services:
+  rabbitmq-service:
+    image: rabbitmq:3
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    
+  redis-service:
+    image: redis:5.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data  # Mount a volume to persist Redis data
+
+  gateway:
+    image: enterprise.knowledge.graph/gateway:latest
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NAMEKO_AMQP_URI=pyamqp://guest:guest@rabbitmq
+    volumes:
+      - shared-data:/mnt/data/uploads
+    depends_on:
+      - rabbitmq-service
+      - redis-service
+
+  user_service:
+    image: enterprise.knowledge.graph/user-service:latest
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    environment:
+      - NAMEKO_AMQP_URI=pyamqp://guest:guest@rabbitmq
+    depends_on:
+      - rabbitmq-service
+      - redis-service
+      - gateway
+
+  agentic_rag_service:
+    image: enterprise.knowledge.graph/agentic-rag-service:latest
+    build:
+      context: ./agentic_rag_service
+      dockerfile: Dockerfile
+    environment:
+      - NAMEKO_AMQP_URI=PLACE_HOLDER
+      - AZURE_OPENAI_ENDPOINT=PLACE_HOLDER
+      - AZURE_OPENAI_API_KEY=PLACE_HOLDER
+      - AZURE_OPENAI_DEPLOYMENT_ID=PLACE_HOLDER
+      - AZURE_AI_SEARCH_ENDPOINT=PLACE_HOLDER
+      - AZURE_AI_SEARCH_API_KEY=PLACE_HOLDER
+      - AZURE_AI_SEARCH_INDEX=PLACE_HOLDER
+    depends_on:
+      - rabbitmq-service
+      - redis-service
+      - gateway
+
+volumes:
+  redis-data:
+  shared-data:

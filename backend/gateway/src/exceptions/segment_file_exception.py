@@ -1,0 +1,2 @@
+class SegmentFileException(Exception):
+    pass
