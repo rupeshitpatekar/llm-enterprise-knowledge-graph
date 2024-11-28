@@ -1,8 +1,0 @@
-AMQP_URI: "pyamqp://guest:guest@rabbitmq-service"
-REDIS_URIS:
-  development: "redis://redis-service:6379/0"
-max_workers: 4
-parent_calls_tracked: 10
-metrics:
-  enabled: true
-  prometheus_port: 9090
