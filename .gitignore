@@ -1,0 +1,8 @@
+*/node_modules
+*/build
+*/dist
+*/.cache
+*/screenshots
+*/package-lock.json*
+/.vscode/*
+/.idea

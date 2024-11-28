@@ -1,0 +1,1 @@
+export { convertToCapitalize } from "./convertToCapitalize";
