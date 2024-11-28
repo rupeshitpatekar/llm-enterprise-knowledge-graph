@@ -7,3 +7,42 @@
 /.vscode/*
 /.idea
 *.DS_Store
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Other files to ignore (customize as needed)
+Thumbs.db
+
+#model training data
+data/
+saved_models/
