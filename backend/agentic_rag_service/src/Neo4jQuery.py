@@ -1,4 +1,4 @@
-from backend.Neo4jApp import app
+from backend.agentic_rag_service.src.Neo4jApp import app
 
 query = """
 MATCH (p:Person)-[:KNOWS]->(friend)
