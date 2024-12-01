@@ -2,12 +2,8 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import date
 
-from neo4j.time import DateTime
-
-
 @dataclass
 class DocumentDTO:
-
     documentName: str
     author: str
     lastModifiedDate: date

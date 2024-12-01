@@ -10,4 +10,5 @@ elasticsearch==8.10.0
 langchain
 langchain_community
 faiss-cpu
-
+neo4j
+neo4j-rust-ext

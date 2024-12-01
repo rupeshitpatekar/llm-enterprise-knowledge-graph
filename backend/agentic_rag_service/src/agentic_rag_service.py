@@ -9,9 +9,12 @@ from langchain import OpenAI, FAISS
 from langchain.chains import RetrievalQA
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import SequentialChain
+
+from dtos.project_dto import ProjectDTO
 from services.feedback_agent import FeedbackAgent
 from services.generator_agent import GeneratorAgentService
 from services.retriever_agent import RetrieverAgentService
+from neo4j import GraphDatabase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +46,10 @@ class AgenticRAGService:
         self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm, retriever=self.retriever)
         # Initialize the cache
         self.landchainCache = Cache()
+
+        # Initialize the Neo4j driver
+        neo4j_user, neo4j_password = os.getenv("NEO4J_AUTH").split('/')
+        self.driver = GraphDatabase.driver("bolt://localhost:7687", auth=(neo4j_user, neo4j_password))
 
     @rpc
     def generate_agentic_llm_output(self, user_message):
@@ -114,3 +121,83 @@ class AgenticRAGService:
         except Exception as e:
             logger.error(f"Error improving system: {e}")
             return {"status": "error", "message": str(e)}
+
+    @rpc
+    def create_project(self, project_data: ProjectDTO):
+        try:
+            with self.driver.session() as session:
+                result = session.write_transaction(self._create_project_transaction, project_data)
+                return result
+        except Exception as e:
+            logger.error(f"Error creating project: {e}")
+            return {"status": "error", "message": str(e)}
+
+    @staticmethod
+    def _create_project_transaction(tx, project: ProjectDTO):
+        # Create Project Node
+        tx.run(
+            "CREATE (p:Project {projectId: $projectId, projectName: $projectName, description: $description, "
+            "startDate: $startDate, endDate: $endDate, budget: $budget, status: $status, "
+            "projectIndustry: $projectIndustry, assets: $assets, benefits: $benefits})",
+            projectId=project.projectId,
+            projectName=project.projectName,
+            description=project.description,
+            startDate=project.startDate,
+            endDate=project.endDate,
+            budget=project.budget,
+            status=project.status,
+            projectIndustry=project.projectIndustry,
+            assets=project.assets,
+            benefits=project.benefits
+        )
+
+        # Create Activities and Relationships
+        for activity in project.activities:
+            tx.run(
+                "CREATE (a:Activity {activityId: $activityId, activityName: $activityName, startDate: $startDate, "
+                "endDate: $endDate, status: $status})",
+                activityId=activity.activityId,
+                activityName=activity.activityName,
+                startDate=activity.startDate,
+                endDate=activity.endDate,
+                status=activity.status
+            )
+            tx.run(
+                "MATCH (p:Project {projectId: $projectId}), (a:Activity {activityId: $activityId}) "
+                "CREATE (p)-[:HAS_ACTIVITY]->(a)",
+                projectId=project.projectId,
+                activityId=activity.activityId
+            )
+
+        # Create Documents and Relationships
+        for document in project.documents:
+            tx.run(
+                "CREATE (d:Document {documentId: $documentId, documentName: $documentName, type: $type, "
+                "createdDate: $createdDate})",
+                documentId=document.documentId,
+                documentName=document.documentName,
+                type=document.type,
+                createdDate=document.createdDate
+            )
+            tx.run(
+                "MATCH (p:Project {projectId: $projectId}), (d:Document {documentId: $documentId}) "
+                "CREATE (p)-[:HAS_DOCUMENT]->(d)",
+                projectId=project.projectId,
+                documentId=document.documentId
+            )
+
+        # Create Members and Relationships
+        for member in project.members:
+            tx.run(
+                "CREATE (m:Member {memberId: $memberId, name: $name, role: $role, startDate: $startDate})",
+                memberId=member.memberId,
+                name=member.name,
+                role=member.role,
+                startDate=member.startDate
+            )
+            tx.run(
+                "MATCH (p:Project {projectId: $projectId}), (m:Member {memberId: $memberId}) "
+                "CREATE (p)-[:HAS_MEMBER]->(m)",
+                projectId=project.projectId,
+                memberId=member.memberId
+            )

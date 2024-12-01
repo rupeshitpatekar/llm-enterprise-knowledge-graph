@@ -7,6 +7,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.wrappers import Response
 from nameko.rpc import RpcProxy
 from nameko.web.handlers import http
+
+from backend.agentic_rag_service.src.dtos.project_dto import ProjectDTO
 from utils.token_utils import validate_token
 from dtos.user_data import UserData
 from dtos.model_config_data import ModelConfigData
@@ -446,3 +448,15 @@ class GatewayService:
             logger.error(f"Unexpected error: {e}")
             return Response(json.dumps({"error": "Internal Server Error", "message": str(e)}), status=500,
                             mimetype='application/json')
+
+    @http("POST", "/services/graph/projects")
+    def create_project(self, request):
+        """Create a new project."""
+        try:
+            self.validate_request(request)
+            project_data = ProjectDTO(**request.get_json())
+            result = self.agentic_rag_service_rpc.create_project(project_data)
+            return 200, json.dumps(result)
+        except Exception as e:
+            logger.error(f"Error in creating project: {e}")
+            return 500, json.dumps({"error": "Internal Server Error", "details": str(e)})
