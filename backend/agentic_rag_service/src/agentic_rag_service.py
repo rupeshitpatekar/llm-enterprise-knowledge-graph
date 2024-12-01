@@ -212,3 +212,69 @@ class AgenticRAGService:
                 projectId=project.projectId,
                 memberId=member.memberId
             )
+
+    @rpc
+    def get_projects(self):
+        try:
+            with self.driver.session() as session:
+                result = session.read_transaction(self._get_projects_transaction)
+                return result
+        except Exception as e:
+            logger.error(f"Error retrieving projects: {e}")
+            return {"status": "error", "message": str(e)}
+
+    @staticmethod
+    def _get_projects_transaction(tx):
+        query = """
+        MATCH (p:Project)
+        OPTIONAL MATCH (p)-[:HAS_ACTIVITY]->(a:Activity)
+        OPTIONAL MATCH (p)-[:HAS_DOCUMENT]->(d:Document)
+        OPTIONAL MATCH (p)-[:HAS_MEMBER]->(m:Member)
+        RETURN p, collect(a) as activities, collect(d) as documents, collect(m) as members
+        """
+        result = tx.run(query)
+        projects = []
+        for record in result:
+            project = record["p"]
+            activities = record["activities"]
+            documents = record["documents"]
+            members = record["members"]
+            projects.append({
+                "projectId": project["projectId"],
+                "projectName": project["projectName"],
+                "description": project["description"],
+                "startDate": project["startDate"],
+                "endDate": project["endDate"],
+                "budget": project["budget"],
+                "status": project["status"],
+                "projectIndustry": project["projectIndustry"],
+                "assets": project["assets"],
+                "benefits": project["benefits"],
+                "activities": [
+                    {
+                        "activityId": activity["activityId"],
+                        "activityName": activity["activityName"],
+                        "startDate": activity["startDate"],
+                        "endDate": activity["endDate"],
+                        "status": activity["status"],
+                        "author": activity["author"]
+                    } for activity in activities
+                ],
+                "documents": [
+                    {
+                        "documentId": document["documentId"],
+                        "documentName": document["documentName"],
+                        "type": document["type"],
+                        "createdDate": document["createdDate"]
+                    } for document in documents
+                ],
+                "members": [
+                    {
+                        "memberId": member["memberId"],
+                        "name": member["name"],
+                        "role": member["role"],
+                        "startDate": member["startDate"]
+                    } for member in members
+                ]
+            })
+        return projects

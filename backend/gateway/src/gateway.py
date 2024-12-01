@@ -482,3 +482,17 @@ class GatewayService:
             logger.error(f"Error in creating project: {e}")
             return Response(json.dumps({"error": "Internal Server Error", "details": str(e)}), status=500,
                             mimetype='application/json')
+
+    @http('GET', '/services/graph/projects')
+    def get_projects(self, request):
+        """Retrieve a list of projects."""
+        try:
+            self.validate_request(request)
+            projects = self.agentic_rag_service_rpc.get_projects()
+            return Response(json.dumps(projects), status=200, mimetype='application/json')
+        except UnauthorizedException as e:
+            return e.to_response()
+        except Exception as e:
+            logger.error(f"Error retrieving projects: {e}")
+            return Response(json.dumps({"error": "Internal Server Error", "message": str(e)}), status=500,
+                            mimetype='application/json')
