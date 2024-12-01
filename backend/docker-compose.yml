@@ -18,8 +18,8 @@ services:
   gateway:
     image: enterprise.knowledge.graph/gateway:latest
     build:
-      context: ./gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: gateway/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -33,8 +33,8 @@ services:
   user_service:
     image: enterprise.knowledge.graph/user-service:latest
     build:
-      context: ./user_service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: user_service/Dockerfile
     environment:
       - NAMEKO_AMQP_URI=pyamqp://guest:guest@rabbitmq
     depends_on:
@@ -45,8 +45,8 @@ services:
   agentic_rag_service:
     image: enterprise.knowledge.graph/agentic-rag-service:latest
     build:
-      context: ./agentic_rag_service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: agentic_rag_service/Dockerfile
     environment:
       - NAMEKO_AMQP_URI=PLACE_HOLDER
       - AZURE_OPENAI_ENDPOINT=PLACE_HOLDER
@@ -55,6 +55,8 @@ services:
       - AZURE_AI_SEARCH_ENDPOINT=PLACE_HOLDER
       - AZURE_AI_SEARCH_API_KEY=PLACE_HOLDER
       - AZURE_AI_SEARCH_INDEX=PLACE_HOLDER
+      - NEO4J_AUTH=PLACE_HOLDER
+      - NEO4J_URI=bolt://neo4j:7687
     depends_on:
       - rabbitmq-service
       - redis-service

@@ -3,14 +3,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade pip
+COPY shared/ /app/shared/
+
+COPY agentic_rag_service/ /app/agentic_rag_service/
+COPY agentic_rag_service/requirements.txt /app/requirements.txt
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-
 # Set the PYTHONPATH to include the /app directory
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app:/app/agentic_rag_service/src
 
-CMD ["nameko", "run", "--config", "config.yml", "src.agentic_rag_service"]
+CMD ["nameko", "run", "--config", "agentic_rag_service/config.yml", "agentic_rag_service"]

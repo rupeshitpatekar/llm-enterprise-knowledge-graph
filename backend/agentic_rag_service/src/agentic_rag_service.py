@@ -1,4 +1,4 @@
-from nameko.rpc import rpc, RpcProxy
+from nameko.rpc import rpc
 from nameko_redis import Redis
 import logging
 import openai
@@ -10,11 +10,14 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import SequentialChain
 
-from dtos.project_dto import ProjectDTO
+from shared.dtos.project_dto import ProjectDTO
+from shared.dtos.activities_dto import ActivityDTO
+from shared.dtos.document_dto import DocumentDTO
+from shared.dtos.member_dto import MemberDTO
 from services.feedback_agent import FeedbackAgent
 from services.generator_agent import GeneratorAgentService
 from services.retriever_agent import RetrieverAgentService
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, basic_auth
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -37,19 +40,23 @@ class AgenticRAGService:
             api_version="2024-02-01",
         )
         # Initialize Langchain components
-        self.llm = OpenAI(temperature=0.5, model_name="text-davinci-003", api_key=self.api_key)
-        self.embeddings = OpenAIEmbeddings()
-        self.vectorstore = FAISS.load_local("path/to/vectorstore", self.embeddings)
-        self.retriever = self.vectorstore.as_retriever()
+        #self.llm = OpenAI(temperature=0.5, model_name="text-davinci-003", api_key=self.api_key)
+        #self.embeddings = OpenAIEmbeddings()
+        #self.vectorstore = FAISS.load_local("path/to/vectorstore", self.embeddings)
+        #self.retriever = self.vectorstore.as_retriever()
 
         # Create a RetrievalQA chain using Langchain
-        self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm, retriever=self.retriever)
+        #self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm, retriever=self.retriever)
         # Initialize the cache
-        self.landchainCache = Cache()
+        #self.landchainCache = Cache()
 
         # Initialize the Neo4j driver
-        neo4j_user, neo4j_password = os.getenv("NEO4J_AUTH").split('/')
-        self.driver = GraphDatabase.driver("bolt://localhost:7687", auth=(neo4j_user, neo4j_password))
+        neo4j_auth = os.getenv("NEO4J_AUTH")
+        neo4j_uri = os.getenv("NEO4J_URI")
+        if not neo4j_auth:
+            raise ValueError("NEO4J_AUTH environment variable is not set")
+        neo4j_user, neo4j_password = neo4j_auth.split('/')
+        self.driver = GraphDatabase.driver(neo4j_uri, auth=basic_auth(neo4j_user, neo4j_password))
 
     @rpc
     def generate_agentic_llm_output(self, user_message):
@@ -79,24 +86,24 @@ class AgenticRAGService:
             return {"error": str(e)}
 
     @rpc
-    def generate_llm_output_using_langchain(self, user_message):
-        logger.info(f"Generating LLM output for user message using Langchain with custom prompt: {user_message}")
-        try:
-            # Define a custom prompt template
-            custom_prompt = f"Based on the following context, answer the question:\n\nContext: {{context}}\n\nQuestion: {{query}}\n\nAnswer:"
+    #def generate_llm_output_using_langchain(self, user_message):
+    #    logger.info(f"Generating LLM output for user message using Langchain with custom prompt: {user_message}")
+    #    try:
+    #        # Define a custom prompt template
+    #        custom_prompt = f"Based on the following context, answer the question:\n\nContext: {{context}}\n\nQuestion: {{query}}\n\nAnswer:"
 
             # Combine agents into a composite chain
-            composite_chain = SequentialChain(chains=[self.qa_chain])
+    #        composite_chain = SequentialChain(chains=[self.qa_chain])
 
             # Use Langchain chain with the custom prompt to retrieve context and generate response
-            result = composite_chain({"query": user_message, "prompt": custom_prompt})
+    #        result = composite_chain({"query": user_message, "prompt": custom_prompt})
             #result = self.qa_chain({"query": user_message, "prompt": custom_prompt})
-            context = result.get("context")
-            response = result.get("result")
-            return {"context": context, "response": response}
-        except Exception as e:
-            logger.error(f"Error generating LLM output: {e}")
-            return {"error": str(e)}
+    #        context = result.get("context")
+    #        response = result.get("result")
+    #        return {"context": context, "response": response}
+    #    except Exception as e:
+    #        logger.error(f"Error generating LLM output: {e}")
+    #        return {"error": str(e)}
 
     @rpc
     def store_feedback(self, user_message, context, response, feedback):
@@ -123,11 +130,12 @@ class AgenticRAGService:
             return {"status": "error", "message": str(e)}
 
     @rpc
-    def create_project(self, project_data: ProjectDTO):
+    def create_project(self, project_data):
         try:
+            project_dto = ProjectDTO(**project_data)
             with self.driver.session() as session:
-                result = session.write_transaction(self._create_project_transaction, project_data)
-                return result
+                session.write_transaction(self._create_project_transaction, project_dto)
+                return {"response": "Project created successfully"}
         except Exception as e:
             logger.error(f"Error creating project: {e}")
             return {"status": "error", "message": str(e)}
@@ -152,7 +160,8 @@ class AgenticRAGService:
         )
 
         # Create Activities and Relationships
-        for activity in project.activities:
+        for activity_data in project.activities:
+            activity = ActivityDTO(**activity_data)
             tx.run(
                 "CREATE (a:Activity {activityId: $activityId, activityName: $activityName, startDate: $startDate, "
                 "endDate: $endDate, status: $status})",
@@ -170,7 +179,8 @@ class AgenticRAGService:
             )
 
         # Create Documents and Relationships
-        for document in project.documents:
+        for document_data in project.documents:
+            document = DocumentDTO(**document_data)
             tx.run(
                 "CREATE (d:Document {documentId: $documentId, documentName: $documentName, type: $type, "
                 "createdDate: $createdDate})",
@@ -187,7 +197,8 @@ class AgenticRAGService:
             )
 
         # Create Members and Relationships
-        for member in project.members:
+        for member_data in project.members:
+            member = MemberDTO(**member_data)
             tx.run(
                 "CREATE (m:Member {memberId: $memberId, name: $name, role: $role, startDate: $startDate})",
                 memberId=member.memberId,

@@ -3,12 +3,14 @@ import json
 import logging
 import io
 import os
+import datetime
+
 from werkzeug.utils import secure_filename
 from werkzeug.wrappers import Response
 from nameko.rpc import RpcProxy
 from nameko.web.handlers import http
 
-from backend.agentic_rag_service.src.dtos.project_dto import ProjectDTO
+from shared.dtos.project_dto import ProjectDTO
 from utils.token_utils import validate_token
 from dtos.user_data import UserData
 from dtos.model_config_data import ModelConfigData
@@ -16,6 +18,7 @@ from dtos.segment_file_request import SegmentFileRequest
 from utils.file_utils import allowed_file
 from exceptions.unauthorised_exception import UnauthorizedException
 from zipfile import ZipFile
+from dataclasses import asdict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -455,8 +458,27 @@ class GatewayService:
         try:
             self.validate_request(request)
             project_data = ProjectDTO(**request.get_json())
-            result = self.agentic_rag_service_rpc.create_project(project_data)
-            return 200, json.dumps(result)
+            project_dict = asdict(project_data)
+
+            # Convert datetime.date objects to strings
+            for key, value in project_dict.items():
+                if isinstance(value, datetime.date):
+                    project_dict[key] = value.isoformat()
+                elif isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, dict):
+                            for k, v in item.items():
+                                if isinstance(v, datetime.date):
+                                    item[k] = v.isoformat()
+
+            self.agentic_rag_service_rpc.create_project(project_dict)
+
+            response = {
+                'response': 'Project created successfully',
+                'project': project_dict
+            }
+            return Response(json.dumps(response), status=200, mimetype='application/json')
         except Exception as e:
             logger.error(f"Error in creating project: {e}")
-            return 500, json.dumps({"error": "Internal Server Error", "details": str(e)})
+            return Response(json.dumps({"error": "Internal Server Error", "details": str(e)}), status=500,
+                            mimetype='application/json')

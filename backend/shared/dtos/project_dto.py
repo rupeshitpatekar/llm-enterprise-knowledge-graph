@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import List
 
-from dtos.activities_dto import ActivityDTO
-from dtos.document_dto import DocumentDTO
-from dtos.member_dto import MemberDTO
+from shared.dtos.activities_dto import ActivityDTO
+from shared.dtos.document_dto import DocumentDTO
+from shared.dtos.member_dto import MemberDTO
 
 
 @dataclass

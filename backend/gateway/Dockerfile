@@ -3,12 +3,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY shared/ /app/shared/
+
+COPY gateway/ /app/gateway/
+COPY gateway/requirements.txt /app/requirements.txt
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+ENV PYTHONPATH=/app:/app/gateway/src
 
-# Set the PYTHONPATH to include the /app directory
-ENV PYTHONPATH=/app/src
-
-CMD ["nameko", "run", "--config", "config.yml", "src.gateway"]
+CMD ["nameko", "run", "--config", "gateway/config.yml", "gateway"]

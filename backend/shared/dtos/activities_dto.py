@@ -8,5 +8,6 @@ class ActivityDTO:
     startDate: str
     endDate: str
     status: str
+    author: str
     activityId: str = field(default_factory=lambda: str(uuid.uuid4()))
     createdDate: date = field(default_factory=date.today)
