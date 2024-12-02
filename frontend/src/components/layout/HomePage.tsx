@@ -1,12 +1,5 @@
-import type { FC, SyntheticEvent } from "react";
-import { useState } from "react";
-import {
-  Alert,
-  Box,
-  Snackbar,
-  SnackbarCloseReason,
-  useTheme,
-} from "@mui/material";
+import type { FC } from "react";
+import { Box, useTheme } from "@mui/material";
 import { ptTokenValidityCheck } from "@/util";
 import type { ApiResponse } from "@/types";
 import Navbar from "./Navbar";
@@ -20,30 +13,21 @@ import { treeData } from "../data";
 import UpdateNode from "../UpdateNode";
 
 interface HomePageProps {
+  setOpen: (open: boolean) => void;
+  setSnackbarMessage: (message: ApiResponse) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const HomePage: FC<HomePageProps> = ({ setIsAuthenticated }) => {
+const HomePage: FC<HomePageProps> = ({
+  setOpen,
+  setSnackbarMessage,
+  setIsAuthenticated,
+}) => {
   const theme = useTheme();
-  const [open, setOpen] = useState<boolean>(false);
-  const [snakbarMessage, setSnackbarMessage] = useState<ApiResponse>();
-
-  console.log(setSnackbarMessage);
 
   const handleSignout = () => {
     localStorage.clear();
     setIsAuthenticated(ptTokenValidityCheck());
-  };
-
-  const handleSnackbarClose = (
-    _event?: SyntheticEvent | Event,
-    reason?: SnackbarCloseReason
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
   };
 
   return (
@@ -71,21 +55,7 @@ const HomePage: FC<HomePageProps> = ({ setIsAuthenticated }) => {
           <Route path="/" element={<NodeStructure data={treeData} />} />
         </Routes>
       </Box>
-      <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snakbarMessage?.type}
-          variant="filled"
-          sx={{ width: "100%", color: theme.palette.common.white }}
-        >
-          {snakbarMessage?.message}
-        </Alert>
-      </Snackbar>
+
       <Footer />
     </Box>
   );

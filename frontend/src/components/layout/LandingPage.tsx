@@ -13,16 +13,22 @@ import {
 } from "@mui/material";
 import { useAssistantLoginMutation, useRegisterUserMutation } from "@/services";
 import { ptTokenValidityCheck, setToken } from "@/util";
-import type { ApiError, AssistantLoginApiArg } from "@/types";
+import type { ApiError, ApiResponse, AssistantLoginApiArg } from "@/types";
 import LoginForm from "./LoginForm";
 
 const Logo = new URL("./logo.png", import.meta.url).href;
 
 interface LandingPageProps {
+  setOpen: (open: boolean) => void;
+  setSnackbarMessage: (message: ApiResponse) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
+const LandingPage: FC<LandingPageProps> = ({
+  setOpen,
+  setSnackbarMessage,
+  setIsAuthenticated,
+}) => {
   const theme = useTheme();
   const [showLoginForm, setShowLoginForm] = useState<boolean>(false);
   const [showSignupForm, setShowSignupForm] = useState<boolean>(false);
@@ -45,12 +51,26 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
         setIsAuthenticated(ptTokenValidityCheck());
       }
 
-      setShowSignupForm(false);
+      if (response && showSignupForm) {
+        setOpen(true);
+        setSnackbarMessage({
+          message: "User registered successfully",
+          type: "success",
+        });
+        setShowSignupForm(false);
+      }
     } catch (e) {
       const error = e as ApiError;
       error.data.includes("Got `401`")
         ? setErrorMessage("Invalid credentials, please try again.")
         : setErrorMessage(error.data);
+
+      if (showSignupForm) {
+        setSnackbarMessage({
+          message: "User registration failed",
+          type: "error",
+        });
+      }
     }
   };
 

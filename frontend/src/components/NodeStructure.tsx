@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FC } from "react";
 import * as d3 from "d3";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -185,7 +186,7 @@ const NodeStructure: FC<NodeStructureProps> = () => {
           border: "1px solid #ccc",
           borderRadius: 4,
           flex: 1,
-          height: "600px",
+          height: "1200px",
           overflowY: "auto",
           overflowX: "auto",
         }}
@@ -196,6 +197,15 @@ const NodeStructure: FC<NodeStructureProps> = () => {
       {selectedNode && (
         <Card sx={{ width: 300 }}>
           <CardContent>
+            <Button
+              size="small"
+              color="primary"
+              onClick={() => setSelectedNode(null)}
+              variant="outlined"
+              sx={{ ml: "auto", display: "block" }}
+            >
+              Close
+            </Button>
             <Typography variant="h6" mb={2}>
               Node Details
             </Typography>
