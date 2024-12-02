@@ -16,7 +16,7 @@ import { ptTokenValidityCheck, setToken } from "@/util";
 import type { ApiError, AssistantLoginApiArg } from "@/types";
 import LoginForm from "./LoginForm";
 
-const Logo = new URL("./meera.png", import.meta.url).href;
+const Logo = new URL("./logo.png", import.meta.url).href;
 
 interface LandingPageProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -100,7 +100,7 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
                 textAlign: { xs: "center", md: "left" },
               }}
             >
-              Sign in to experience IMPS Developer Assistant
+              Sign in to experience Enterprise Knowledge Graph for Teams
             </Typography>
             <Typography
               variant="h5"

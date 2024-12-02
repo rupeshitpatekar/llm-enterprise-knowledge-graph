@@ -1,7 +1,7 @@
 import moment from "moment";
 import { getToken } from "../getToken";
 import jwtDecode from "jwt-decode";
-import type { JWTDecodeData } from "../../types";
+import type { JWTDecodeData } from "@/types";
 
 export const ptTokenValidityCheck = () => {
   const token = getToken();

@@ -1,9 +1,10 @@
-import { useState, type FC } from "react";
+import type { FC } from "react";
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import PrivateWrapper from "./routes/PrivateWrapper";
-import HomePage from "./components/HomePage";
-import LandingPage from "./components/LandingPage";
+
 import { ptTokenValidityCheck } from "./util";
+import { HomePage, LandingPage } from "./components";
 
 interface AppProps {}
 

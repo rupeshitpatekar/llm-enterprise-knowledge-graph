@@ -11,24 +11,21 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { LogoutOutlined } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-const Logo = new URL("./meera.png", import.meta.url).href;
+const Logo = new URL("./logo.png", import.meta.url).href;
 
 interface NavbarProps {
   signout: () => void;
-  handleNewChat: () => void;
 }
 
-const Navbar: FC<NavbarProps> = ({ signout, handleNewChat }) => {
+const Navbar: FC<NavbarProps> = ({ signout }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const mediumScreen = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
-    <AppBar
-      id="header"
-      position="static"
-      sx={{ backgroundColor: theme.palette.background.default, boxShadow: 0 }}
-    >
+    <AppBar id="header" position="static">
       <Toolbar
         sx={{ minHeight: "3rem !important", maxHeight: "3rem !important" }}
       >
@@ -37,8 +34,8 @@ const Navbar: FC<NavbarProps> = ({ signout, handleNewChat }) => {
             id="navigate-to-action"
             color="inherit"
             disableRipple
-            onClick={handleNewChat}
-            sx={{ alignItems: "end" }}
+            onClick={() => navigate("/")}
+            sx={{ alignItems: "center" }}
           >
             <Box
               component="img"
@@ -63,29 +60,27 @@ const Navbar: FC<NavbarProps> = ({ signout, handleNewChat }) => {
                 variant={mediumScreen ? "h5" : "h6"}
                 paddingLeft={1}
                 sx={{
-                  color: theme.palette.primary.main,
                   lineHeight: "1.25rem",
                 }}
               >
-                IMPS
+                Enterprise
               </Typography>
               <Typography
                 key="IMPS_header"
                 variant="body2"
                 sx={{
-                  color: theme.palette.common.black,
-                  fontSize: "0.75rem",
+                  lineHeight: "1.25rem",
                 }}
                 paddingLeft={1.1}
                 letterSpacing={2}
               >
-                FRAMEWORK
+                Knowledge Graph
               </Typography>
             </Stack>
           </IconButton>
         </Box>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={() => signout()}
           startIcon={<LogoutOutlined />}
           size="small"

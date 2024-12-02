@@ -1,3 +1,5 @@
+import { CreateNodeFormMethods } from "../components";
+
 export interface AssistantLoginApiArg {
   username: string;
   password: string;
@@ -7,17 +9,6 @@ export interface AssistantLoginApiRes {
   token: string;
 }
 
-export interface GenerateLLMOutputApiArg {
-  prompt: string;
-}
+export type CreateProjectApiArg = CreateNodeFormMethods;
 
-export interface GenerateLLMOutputApiRes {
-  id: string;
-  choices: [
-    {
-      message: {
-        content: string;
-      };
-    },
-  ];
-}
+export type CreateProjectApiRes = CreateNodeFormMethods[];

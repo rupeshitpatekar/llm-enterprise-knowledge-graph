@@ -23,7 +23,7 @@ export default ({ mode }) => {
     plugins: [
       react(),
       federation({
-        name: "developer-assistant",
+        name: "neural-quartet",
         filename: "remoteEntry.js",
         exposes: {
           "./App": "./src/App.tsx",
@@ -55,9 +55,8 @@ export default ({ mode }) => {
       port: 8902,
       strictPort: true,
       proxy: {
-        "/api": {
-          target:
-            "https://dev-assist-services.530fd7c8e80241b2a4ca.centralindia.aksapp.io",
+        "/services": {
+          target: "http://localhost:8000",
           changeOrigin: true,
         },
       },

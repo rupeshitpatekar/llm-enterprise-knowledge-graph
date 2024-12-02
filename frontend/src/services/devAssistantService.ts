@@ -15,15 +15,16 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
   AssistantLoginApiArg,
   AssistantLoginApiRes,
-  GenerateLLMOutputApiArg,
+  CreateProjectApiArg,
+  CreateProjectApiRes,
 } from "@/types";
 import { getToken, ptTokenValidityCheck } from "@/util";
 
 export const devAssistantApi = createApi({
   reducerPath: "devAssistantApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "/api",
-    prepareHeaders: (headers) => {
+    baseUrl: "/services",
+    prepareHeaders: headers => {
       if (ptTokenValidityCheck()) {
         headers.set("Authorization", `Bearer ${getToken()}`);
       }
@@ -33,26 +34,36 @@ export const devAssistantApi = createApi({
     credentials: "include",
   }),
   tagTypes: ["Requests"],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     assistantLogin: builder.mutation<
       AssistantLoginApiRes,
       AssistantLoginApiArg
     >({
-      query: (body) => ({
+      query: body => ({
         url: "/login",
         method: "POST",
         body,
       }),
     }),
-    generateLLMOutput: builder.mutation<string, GenerateLLMOutputApiArg>({
-      query: (body) => ({
-        url: "/generate-llm-output",
+    createProject: builder.mutation<CreateProjectApiRes, CreateProjectApiArg>({
+      query: body => ({
+        url: "/graph/projects",
         method: "POST",
+        body,
+      }),
+    }),
+    listProjects: builder.query<CreateProjectApiRes, void>({
+      query: body => ({
+        url: "/graph/projects",
+        method: "GET",
         body,
       }),
     }),
   }),
 });
 
-export const { useAssistantLoginMutation, useGenerateLLMOutputMutation } =
-  devAssistantApi;
+export const {
+  useAssistantLoginMutation,
+  useCreateProjectMutation,
+  useListProjectsQuery,
+} = devAssistantApi;

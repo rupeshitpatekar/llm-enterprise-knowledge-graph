@@ -1,13 +1,13 @@
 FROM impsregistry.azurecr.io/baseimages/node:alpine as builder
-WORKDIR /developer-assistant
+WORKDIR /neural-quartet
 
-COPY ./package.json /developer-assistant
+COPY ./package.json /neural-quartet
 RUN npm install
 
-COPY . /developer-assistant
+COPY . /neural-quartet
 RUN npm run release
 
 FROM impsregistry.azurecr.io/baseimages/nginx:stable-alpine
 COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder developer-assistant/dist /usr/share/nginx/html
+COPY --from=builder neural-quartet/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
