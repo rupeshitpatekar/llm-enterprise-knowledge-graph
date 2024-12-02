@@ -18,7 +18,7 @@ export const CREATE_NODE_DEFAULT_VALUES: CreateNodeFormMethods = {
   budget: "",
   status: null,
   projectIndustry: "",
-  assets: false,
+  assets: "No",
   benefits: "",
   activities: [
     {

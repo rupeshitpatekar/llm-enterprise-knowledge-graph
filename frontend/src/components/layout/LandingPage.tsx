@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useAssistantLoginMutation } from "@/services";
+import { useAssistantLoginMutation, useRegisterUserMutation } from "@/services";
 import { ptTokenValidityCheck, setToken } from "@/util";
 import type { ApiError, AssistantLoginApiArg } from "@/types";
 import LoginForm from "./LoginForm";
@@ -25,8 +25,12 @@ interface LandingPageProps {
 const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
   const theme = useTheme();
   const [showLoginForm, setShowLoginForm] = useState<boolean>(false);
+  const [showSignupForm, setShowSignupForm] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [login, { isLoading: loginLoading }] = useAssistantLoginMutation();
+  const [register, { isLoading: registerLoading }] = useRegisterUserMutation();
+
+  const loading = loginLoading || registerLoading;
 
   const loginFormMethods = useForm<AssistantLoginApiArg>({
     mode: "onSubmit",
@@ -34,11 +38,14 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
 
   const handleLoginSubmit = async (data: AssistantLoginApiArg) => {
     try {
-      const response = await login(data).unwrap();
-      if (response) {
+      let callback = showSignupForm ? register : login;
+      const response = await callback(data).unwrap();
+      if (response && !showSignupForm) {
         setToken(response);
         setIsAuthenticated(ptTokenValidityCheck());
       }
+
+      setShowSignupForm(false);
     } catch (e) {
       const error = e as ApiError;
       error.data.includes("Got `401`")
@@ -50,6 +57,17 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
   const handleCancelClick = () => {
     setErrorMessage("");
     setShowLoginForm(false);
+    loginFormMethods.reset();
+  };
+
+  const handleSignUpClick = () => {
+    setShowLoginForm(false);
+    setShowSignupForm(true);
+  };
+
+  const handleCancelSignupClick = () => {
+    setErrorMessage("");
+    setShowSignupForm(false);
     loginFormMethods.reset();
   };
 
@@ -95,56 +113,68 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
             alignItems={{ xs: "center", md: "flex-start" }}
           >
             <Typography
-              variant="h4"
-              sx={{
-                textAlign: { xs: "center", md: "left" },
-              }}
-            >
-              Sign in to experience Enterprise Knowledge Graph for Teams
-            </Typography>
-            <Typography
               variant="h5"
               sx={{
                 textAlign: { xs: "center", md: "left" },
               }}
             >
-              Please sign in with your credentials.
+              Enterprise Knowledge Graph for Teams
             </Typography>
+            {
+              <Typography
+                variant="h6"
+                sx={{
+                  textAlign: { xs: "center", md: "left" },
+                }}
+              >
+                {showSignupForm
+                  ? "Please enter username and password to register."
+                  : "Please sign in with your credentials."}
+              </Typography>
+            }
             {errorMessage && (
               <Typography color="error" variant="body2">
                 {errorMessage}
               </Typography>
             )}
-            {showLoginForm && (
-              <LoginForm
-                isLoading={loginLoading}
-                formMethods={loginFormMethods}
-              />
+            {(showLoginForm || showSignupForm) && (
+              <LoginForm isLoading={loading} formMethods={loginFormMethods} />
             )}
             <Stack
               direction="row"
-              justifyContent={showLoginForm ? "space-between" : "flex-start"}
-              width={showLoginForm ? "100%" : "auto"}
+              justifyContent={
+                showLoginForm || showSignupForm ? "center" : "flex-start"
+              }
+              width="100%"
               alignItems="center"
+              spacing={4}
               maxWidth="70%"
             >
-              {showLoginForm && (
-                <Button
-                  variant="outlined"
-                  disableTouchRipple
-                  disabled={loginLoading}
-                  onClick={handleCancelClick}
-                >
-                  Cancel
-                </Button>
-              )}
+              <Button
+                variant="outlined"
+                disableTouchRipple
+                disabled={loading}
+                onClick={
+                  showLoginForm
+                    ? handleCancelClick
+                    : showSignupForm
+                    ? handleCancelSignupClick
+                    : handleSignUpClick
+                }
+              >
+                {showLoginForm
+                  ? "Cancel"
+                  : showSignupForm
+                  ? "Cancel "
+                  : "Sign up"}
+              </Button>
               <Button
                 variant="contained"
                 disableTouchRipple
-                disabled={loginLoading}
-                startIcon={loginLoading && <CircularProgress size={24} />}
+                disabled={loading}
+                startIcon={loading && <CircularProgress size={24} />}
                 onClick={() => {
-                  if (showLoginForm) {
+                  if (showLoginForm || showSignupForm) {
                     loginFormMethods.handleSubmit(handleLoginSubmit)();
                   } else {
                     setShowLoginForm(true);
@@ -152,7 +182,7 @@ const LandingPage: FC<LandingPageProps> = ({ setIsAuthenticated }) => {
                 }}
                 sx={{ mr: showLoginForm ? 0 : "auto" }}
               >
-                Sign in
+                {showSignupForm ? "Sign up" : "Sign in"}
               </Button>
             </Stack>
           </Box>

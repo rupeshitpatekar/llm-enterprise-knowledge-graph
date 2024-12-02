@@ -38,7 +38,7 @@ export interface CreateNodeFormMethods {
   budget: string;
   status: ActivityType | null;
   projectIndustry: string;
-  assets: boolean;
+  assets: string;
   benefits: string;
   activities: ActivityDto[];
   documents: DocumentsDto[];

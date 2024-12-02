@@ -1,6 +1,6 @@
 import { Typography, useTheme, Box, Stack, alpha } from "@mui/material";
 import type { FC } from "react";
-
+const IMPS_LOGO = new URL("./CG_logo.png", import.meta.url).href;
 interface FooterProps {}
 
 const Footer: FC<FooterProps> = () => {
@@ -20,17 +20,17 @@ const Footer: FC<FooterProps> = () => {
           variant="caption"
           color={theme.palette.primary.contrastText}
         >
-          Neural Quarter
+          Enterprise Knwoledge Graph - Neural Quartet
         </Typography>
-        <Typography
-          key="IMPS_header"
-          variant="caption"
-          gutterBottom
-          align="center"
-          color={theme.palette.primary.contrastText}
-        >
-          Enterprise Knwoledge Graph
-        </Typography>
+        <img
+          alt="brand logo"
+          src={IMPS_LOGO}
+          style={{
+            color: theme.palette.common.black,
+            width: 140,
+            height: 15,
+          }}
+        />
       </Stack>
     </Box>
   );

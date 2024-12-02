@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  alpha,
   Button,
   IconButton,
   Stack,
@@ -52,22 +51,22 @@ const MembersAccordian: FC<MembersAccordianProps> = ({
       id: "member-email",
     },
     {
-      name: `members.${index}.role`,
-      type: "text",
-      label: "Role",
-      gridMdWidth: 3,
-      required: true,
-      placeholder: "Enter role",
-      id: "role",
-    },
-    {
       name: `members.${index}.yearsOfExperience`,
       type: "text",
       label: "Years of experience",
-      gridMdWidth: 6,
+      gridMdWidth: 3,
       required: true,
       placeholder: "Enter years of experience",
       id: "years-of-experience",
+    },
+    {
+      name: `members.${index}.role`,
+      type: "text",
+      label: "Role",
+      gridMdWidth: 6,
+      required: true,
+      placeholder: "Enter role",
+      id: "role",
     },
     {
       name: `members.${index}.startDate`,
@@ -79,7 +78,6 @@ const MembersAccordian: FC<MembersAccordianProps> = ({
       gridMdWidth: 3,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
   ];
 
@@ -90,7 +88,7 @@ const MembersAccordian: FC<MembersAccordianProps> = ({
       sx={{
         marginBottom: 2,
         color: theme.palette.text.primary,
-        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <AccordionSummary
@@ -116,14 +114,16 @@ const MembersAccordian: FC<MembersAccordianProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <CustomFormFields inputs={documentInputs} formMethods={formMethods} />
-        <Button
-          color="error"
-          onClick={() => fieldArray.remove(index)}
-          variant="contained"
-          sx={{ mt: 2, ml: "auto", display: "block" }}
-        >
-          Remove member
-        </Button>
+        {fieldArray.fields.length > 1 && (
+          <Button
+            color="error"
+            onClick={() => fieldArray.remove(index)}
+            variant="contained"
+            sx={{ mt: 2, ml: "auto", display: "block" }}
+          >
+            Remove member
+          </Button>
+        )}
       </AccordionDetails>
     </Accordion>
   );

@@ -12,14 +12,15 @@ const Menubar: FC<MenubarProps> = () => {
 
   const menuItems = [
     { label: "Create node", path: "/create-node" },
-    { label: "Query node", path: "/query-node" },
+    { label: "Update node", path: "/update-node" },
+    { label: "Generate content", path: "/query-node" },
   ];
 
   const getButtonStyle = (path: string) => ({
     textDecoration: "none",
     color:
       location.pathname === path
-        ? theme.palette.error.dark
+        ? theme.palette.primary.main
         : theme.palette.text.secondary,
     ":hover": { backgroundColor: "transparent" },
   });

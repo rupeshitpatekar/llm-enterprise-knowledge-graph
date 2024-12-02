@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  alpha,
   Button,
   IconButton,
   Stack,
@@ -70,7 +69,6 @@ const DocumentsAccordian: FC<DocumentsAccordianProps> = ({
       gridMdWidth: 3,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
     {
       name: `documents.${index}.summary`,
@@ -90,7 +88,7 @@ const DocumentsAccordian: FC<DocumentsAccordianProps> = ({
       sx={{
         marginBottom: 2,
         color: theme.palette.text.primary,
-        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <AccordionSummary
@@ -118,14 +116,16 @@ const DocumentsAccordian: FC<DocumentsAccordianProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <CustomFormFields inputs={documentInputs} formMethods={formMethods} />
-        <Button
-          color="error"
-          onClick={() => fieldArray.remove(index)}
-          variant="contained"
-          sx={{ mt: 2, ml: "auto", display: "block" }}
-        >
-          Remove document
-        </Button>
+        {fieldArray.fields.length > 1 && (
+          <Button
+            color="error"
+            onClick={() => fieldArray.remove(index)}
+            variant="contained"
+            sx={{ mt: 2, ml: "auto", display: "block" }}
+          >
+            Remove document
+          </Button>
+        )}
       </AccordionDetails>
     </Accordion>
   );

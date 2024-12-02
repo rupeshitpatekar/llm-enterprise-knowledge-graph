@@ -138,18 +138,17 @@ const NodeStructure: FC<NodeStructureProps> = () => {
       .append("circle")
       .attr("r", 10)
       .style("fill", d => {
-        switch (d.data.status) {
-          case "not-started":
-            return "red";
-          case "in-progress":
-          case "Ongoing":
-            return "yellow";
-          case "completed":
-          case "Completed":
-            return "green";
-          default:
-            return "#fff";
+        if (d.depth === 1) {
+          return "orange";
         }
+        if (d.data.name === "Activities") {
+          return "lightblue";
+        } else if (d.data.name === "Documents") {
+          return "lightgreen";
+        } else if (d.data.name === "Members") {
+          return "lightpink";
+        }
+        return "#fff";
       })
       .style("stroke", "#3182bd")
       .style("stroke-width", "2px")

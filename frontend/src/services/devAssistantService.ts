@@ -45,6 +45,13 @@ export const devAssistantApi = createApi({
         body,
       }),
     }),
+    registerUser: builder.mutation<AssistantLoginApiRes, AssistantLoginApiArg>({
+      query: body => ({
+        url: "/create-user",
+        method: "POST",
+        body,
+      }),
+    }),
     createProject: builder.mutation<CreateProjectApiRes, CreateProjectApiArg>({
       query: body => ({
         url: "/graph/projects",
@@ -64,6 +71,7 @@ export const devAssistantApi = createApi({
 
 export const {
   useAssistantLoginMutation,
+  useRegisterUserMutation,
   useCreateProjectMutation,
   useListProjectsQuery,
 } = devAssistantApi;

@@ -1,10 +1,13 @@
 import {
+  alpha,
   Box,
   Divider,
   FormControlLabel,
+  Paper,
   Stack,
   Switch,
   Typography,
+  useTheme,
 } from "@mui/material";
 import type { FC } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -21,6 +24,8 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
   borderColor,
   formMethods,
 }) => {
+  const theme = useTheme();
+
   const inputs: Inputs[] = [
     {
       name: "projectName",
@@ -50,7 +55,6 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
       gridMdWidth: 2,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
     {
       name: "endDate",
@@ -62,7 +66,6 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
       gridMdWidth: 2,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
     {
       name: "budget",
@@ -113,6 +116,8 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
         border: "1px solid",
         borderColor: borderColor,
         borderRadius: 4,
+        backgroundColor: alpha(theme.palette.primary.main, 0.5),
+        color: theme.palette.common.black,
       }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -122,8 +127,10 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
         <FormControlLabel
           control={
             <Switch
-              checked={formMethods.watch("assets")}
-              onChange={e => formMethods.setValue("assets", e.target.checked)}
+              checked={formMethods.watch("assets") === "Yes"}
+              onChange={e =>
+                formMethods.setValue("assets", e.target.checked ? "Yes" : "No")
+              }
               color="primary"
             />
           }
@@ -131,9 +138,9 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({
         />
       </Stack>
       <Divider variant="fullWidth" sx={{ borderColor: borderColor }} />
-      <Box p={2}>
+      <Paper elevation={2} sx={{ p: 2, m: 2 }}>
         <CustomFormFields inputs={inputs} formMethods={formMethods} />
-      </Box>
+      </Paper>
     </Box>
   );
 };

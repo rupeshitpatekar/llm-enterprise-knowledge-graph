@@ -5,6 +5,8 @@ import react from "@vitejs/plugin-react";
 const deps = require("./package.json").dependencies;
 import federation from "@originjs/vite-plugin-federation";
 import path from "path";
+import { VitePWA } from "vite-plugin-pwa";
+const manifestConfig = require("./manifest.json");
 
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
@@ -38,6 +40,12 @@ export default ({ mode }) => {
             singleton: true,
             eager: true,
           },
+        },
+      }),
+      VitePWA({
+        manifest: manifestConfig,
+        workbox: {
+          maximumFileSizeToCacheInBytes: 1024 * 5 * 1000,
         },
       }),
     ],

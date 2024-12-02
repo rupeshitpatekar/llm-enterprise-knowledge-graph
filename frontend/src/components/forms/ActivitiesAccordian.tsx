@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  alpha,
   Button,
   IconButton,
   Stack,
@@ -75,7 +74,6 @@ const ActivitiesAccordian: FC<ActivitiesAccordianProps> = ({
       gridMdWidth: 2,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
     {
       name: `activities.${index}.endDate`,
@@ -87,7 +85,6 @@ const ActivitiesAccordian: FC<ActivitiesAccordianProps> = ({
       gridMdWidth: 2,
       required: true,
       dateFormat: FULL_DATE_FORMAT,
-      disablePast: true,
     },
   ];
 
@@ -98,7 +95,7 @@ const ActivitiesAccordian: FC<ActivitiesAccordianProps> = ({
       sx={{
         marginBottom: 2,
         color: theme.palette.text.primary,
-        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <AccordionSummary
@@ -126,14 +123,16 @@ const ActivitiesAccordian: FC<ActivitiesAccordianProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <CustomFormFields inputs={activityInputs} formMethods={formMethods} />
-        <Button
-          color="error"
-          onClick={() => fieldArray.remove(index)}
-          variant="contained"
-          sx={{ mt: 2, ml: "auto", display: "block" }}
-        >
-          Remove activity
-        </Button>
+        {fieldArray.fields.length > 1 && (
+          <Button
+            color="error"
+            onClick={() => fieldArray.remove(index)}
+            variant="contained"
+            sx={{ mt: 2, ml: "auto", display: "block" }}
+          >
+            Remove activity
+          </Button>
+        )}
       </AccordionDetails>
     </Accordion>
   );

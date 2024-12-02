@@ -47,6 +47,14 @@ const CreateNode: FC<CreateNodeProps> = ({ setOpen, setSnackbarMessage }) => {
 
   return (
     <Box>
+      <Button
+        color="primary"
+        onClick={() => {}}
+        variant="outlined"
+        sx={{ mb: 1, ml: "auto", display: "block" }}
+      >
+        Import from CSV
+      </Button>
       <Paper elevation={2} sx={{ p: 2, borderRadius: 4 }}>
         <Box
           style={{
@@ -81,7 +89,11 @@ const CreateNode: FC<CreateNodeProps> = ({ setOpen, setSnackbarMessage }) => {
             mt={2}
             justifyContent="space-between"
           >
-            <Button variant="outlined" onClick={() => {}} id="cancel-action">
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/")}
+              id="cancel-action"
+            >
               Cancel
             </Button>
             <Button

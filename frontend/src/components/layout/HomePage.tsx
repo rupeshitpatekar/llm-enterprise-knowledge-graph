@@ -17,6 +17,7 @@ import NodeStructure from "../NodeStructure";
 import CreateNode from "../CreateNode";
 import QueryNode from "../QueryNode";
 import { treeData } from "../data";
+import UpdateNode from "../UpdateNode";
 
 interface HomePageProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -65,6 +66,7 @@ const HomePage: FC<HomePageProps> = ({ setIsAuthenticated }) => {
               />
             }
           />
+          <Route path="/update-node" element={<UpdateNode />} />
           <Route path="/query-node" element={<QueryNode />} />
           <Route path="/" element={<NodeStructure data={treeData} />} />
         </Routes>

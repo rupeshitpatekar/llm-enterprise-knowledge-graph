@@ -1,5 +1,13 @@
 import { useState, type FC } from "react";
-import { Box, Typography, IconButton, Divider, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Divider,
+  Stack,
+  alpha,
+  useTheme,
+} from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { CreateNodeFormMethods } from "@/types";
@@ -14,6 +22,7 @@ const ActivityDetails: FC<ActivityDetailsProps> = ({
   borderColor,
   formMethods,
 }) => {
+  const theme = useTheme();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const fieldArray = useFieldArray({
@@ -42,6 +51,8 @@ const ActivityDetails: FC<ActivityDetailsProps> = ({
         border: "1px solid",
         borderColor: borderColor,
         borderRadius: 4,
+        backgroundColor: alpha(theme.palette.primary.main, 0.5),
+        color: theme.palette.common.black,
       }}
     >
       <Stack
